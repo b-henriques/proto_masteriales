@@ -1,16 +1,45 @@
-# proto_masteriales
+# Projet masteriales
 
-A new Flutter project.
+Objectif: proof-ofconcept d'application communiquant avec vehicule electrique permettant d'adapter un itineraire en fonction de la charge/niveau d'autonomie actuelle
 
-## Getting Started
+Plan:
+1. Motivation/constats sur les solutions sur le marche actuel
+2. Objectif
+3. Recuperation de carte
+4. Recuperation de donnees stations de recharge
+5. Calcul itineraire
+6. Algo proposé
+7. Resultats
 
-This project is a starting point for a Flutter application.
+---
+## Proof-of-concept
 
-A few resources to get you started if this is your first Flutter project:
+1 serveur en python, flask permettant de recuperer les donnees sur les stations de recharge et de caulculer l'itineraire
+1 application mobile simulant la connexion avec la batterie et le serveur
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
+TODO: (serveur) telechargement des donnees si non presentes <br>
+TODO: (serveur) Actualisation des donnees des stations de recharge <br>
+TODO: (client) buffer stations de recharge(voir figure) <br>
+TODO: (client) Simulation de batterie/vehicule <br>
+TODO: (client) actualisation iteneraire en fonction du temps ecoule, niveua de batterie, eventuel detour <br>
+TODO: (client) indications navigation: nom rue actuelle, sortir a droite,rondpoint... <br>
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+DONE: affichage carte openstreetmap - Bruno <br>
+DONE: serveur calcul distances, passage distance kms vers lat,lon, boundingbox - Bruno <br>
+DONE: serveur flask, requete stations de recharge in range - Bruno <br>
+DONE: affichage des stations de recharge - Bruno <br>
+DONE: serveur flask, communication avec ign geoservices - Bruno <br>
+DONE: serveur flask, requete itineraire simple - Bruno <br>
+DONE: serveur flask requete itineraire en passant par une station de  recharge(algo proposé) - Bruno <br>
+DONE: Affichage du trajet - Bruno <br>
+
+---
+### Test
+
+Http: Connection closed while receiving data. <br>
+https://github.com/flutter/flutter/issues/86772 <br>
+Un probleme de communication est present lorsqu'on utilise un emulateur android. Pensez a utiliser un vrai appareil pour tester le calcul d'itineraire.
+
+Vu le volume du fichier contennant les donnees sur les stations de recharge, il n'est pas present sur ce repo, pensez y a le telecharger et le mettre dans le serveur, dossier ressources (il faut peut etre changer le nom du fichier dans le code? tant qu'on a pas implemente telechargement et actualisation automatique).
