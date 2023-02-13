@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 import json
-from flask import Flask, jsonify, current_app, Response
-from werkzeug.exceptions import BadRequest
+from flask import Flask, jsonify, current_app, Response, make_response
 from werkzeug.serving import WSGIRequestHandler
 
 from stationsRecharge import StationRechargeProvider
 from json import JSONEncoder, dumps
 import ignItineraire
-from dist import distanceInKms
 from battery import BatteryEmulator
 
 
@@ -45,7 +43,7 @@ def calculItineraire(slat, slon, elat, elon, range):
         res = json.load(file)
 
     #res = current_app.geoServices.calculItineraireXYRange((slat, slon), (elat, elon), range)
-    return Response(dumps(res), mimetype='application/json')
+    return Response(dumps(res), mimetype='application/json', headers={})
 
 
 # BATTERY API
@@ -79,13 +77,8 @@ def setStopped():
 if __name__ == '__main__':
     # running the app
     WSGIRequestHandler.protocol_version = "HTTP/1.1"
-    app.run(threaded=True)
+    app.run(threaded=True, host="0.0.0.0")
 
     # Paris-Marseille
     #res = ignItineraire.GeoServices(StationRechargeProvider()).calculItineraireXYRange((48.855595, 2.338286), (43.296292, 5.373333), 150)
     # print(res)
-
-    #s = ignItineraire.GeoServices()
-    #r = ignItineraire.simpleCarRequestBuilder().build((48.6158982, 2.42770525), (48.709696, 2.167326))
-    # print(r.toString())
-    # s.calculItineraire(r)

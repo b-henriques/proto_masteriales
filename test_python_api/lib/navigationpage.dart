@@ -9,9 +9,12 @@ import 'package:test_python_api/stations.dart';
 import 'navigation.dart';
 import 'package:http/http.dart' as http;
 
-class NavigationPage extends StatefulWidget {
-  const NavigationPage({super.key});
+import 'package:location/location.dart';
 
+class NavigationPage extends StatefulWidget {
+  const NavigationPage({super.key, required this.destination});
+
+  final LatLng destination;
   @override
   State<NavigationPage> createState() => _NavigationPageState();
 }
@@ -20,30 +23,39 @@ class _NavigationPageState extends State<NavigationPage> {
   // timer for update
   late Timer timer;
   // battery status
-  late Future<BatteryStatus> batteryStatus;
+  Future<BatteryStatus>? batteryStatus;
   // path
-  late Future<List<Polyline>> futurePath;
+  Future<List<Polyline>>? futurePath;
   // position
-  late LatLng position;
+  Future<LocationData?>? position;
 
-  late DateTime lastUploadDate;
+  DateTime lastUploadDate = DateTime.now();
+
+  double lastBatteryCharge = 0;
+
+  Location location = Location();
 
   @override
   void initState() {
     super.initState();
 
-    //TODO:
-    // set initial position
-    position = LatLng(48.6158982, 2.42770525);
     // fetch battery status
     batteryStatus = fetchBatteryStatus();
-    // fetch path
-    futurePath = fetchPath(position, LatLng(48.709696, 2.167326), 10);
-    // set last upload date
-    lastUploadDate = DateTime.now();
-    //
-    double lastBatteryCharge = 0;
-    batteryStatus.then((value) => lastBatteryCharge = value.charge);
+    batteryStatus?.then((value) {
+      position = getPosition();
+      // set initial position
+      position!.then((posvalue) {
+        // fetch path
+        futurePath = fetchPath(
+            LatLng(posvalue!.latitude!, posvalue!.longitude!),
+            widget.destination,
+            value.range);
+        // set lastbatterycharge
+        lastBatteryCharge = value.charge;
+        // set last upload date
+        lastUploadDate = DateTime.now();
+      });
+    });
 
     //update every x seconds
     timer = Timer.periodic(const Duration(seconds: 5), (Timer t) async {
@@ -69,6 +81,31 @@ class _NavigationPageState extends State<NavigationPage> {
 
       setState(() {});
     });
+  }
+
+  Future<LocationData?> getPosition() async {
+    bool serviceEnabled;
+    PermissionStatus permissionGranted;
+    LocationData locationData;
+
+    serviceEnabled = await location.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await location.requestService();
+      if (!serviceEnabled) {
+        return null;
+      }
+    }
+
+    permissionGranted = await location.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await location.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) {
+        return null;
+      }
+    }
+
+    locationData = await location.getLocation();
+    return locationData;
   }
 
   @override
@@ -175,6 +212,27 @@ class _NavigationPageState extends State<NavigationPage> {
                     },
                   ),
                   RechargeStationsMarkerLayer(),
+                  FutureBuilder<LocationData?>(
+                    future: position,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return MarkerLayer(
+                          markers: [
+                            Marker(
+                              point: LatLng(snapshot.data!.latitude!,
+                                  snapshot.data!.longitude!),
+                              builder: (context) {
+                                return const Icon(Icons.circle);
+                              },
+                            ),
+                          ],
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text('${snapshot.error}');
+                      }
+                      return Text("");
+                    },
+                  )
                 ],
               ),
             ),

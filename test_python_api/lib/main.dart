@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map/plugin_api.dart';
-import 'package:test_python_api/navigationpage.dart';
+import 'package:test_python_api/pickdestinationpage.dart';
 import 'package:test_python_api/stations.dart';
 
 /*
@@ -67,7 +67,8 @@ class _MyAppState extends State<MyApp> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const NavigationPage()),
+                              builder: (context) =>
+                                  const PickDestinationPage()),
                         );
                       },
                       elevation: 2.0,

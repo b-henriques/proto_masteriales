@@ -12,7 +12,7 @@ Future<List<Marker>> fetchStations(
   var client = http.Client();
 
   var uri = Uri.parse(
-      "http://10.0.2.2:5000//stationsInRange/position=${position.latitude},${position.longitude}&range=$distanceInKms");
+      "http://10.0.2.2:5000/stationsInRange/position=${position.latitude},${position.longitude}&range=$distanceInKms");
 
   var response = await client.get(uri);
   /*final response =
