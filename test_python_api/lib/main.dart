@@ -85,7 +85,7 @@ class _MyAppState extends State<MyApp> {
                   TileLayer(
                     urlTemplate:
                         'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'com.example.app',
+                    userAgentPackageName: 'com.protoMasteriales.app',
                   ),
                   RechargeStationsMarkerLayer(),
                 ],
