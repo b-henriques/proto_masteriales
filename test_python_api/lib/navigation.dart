@@ -23,8 +23,8 @@ class _PathPolylineLayerState extends State<PathPolylineLayer> {
   void initState() {
     super.initState();
     position = LatLng(48.6158982, 2.42770525);
-    futurePath = fetchPath(
-        LatLng(48.6158982, 2.42770525), LatLng(48.709696, 2.167326), 10);
+    futurePath =
+        fetchPath(LatLng(48.626067, 2.424743), LatLng(48.709696, 2.167326), 10);
   }
 
   @override
@@ -32,8 +32,6 @@ class _PathPolylineLayerState extends State<PathPolylineLayer> {
     final map = FlutterMapState.maybeOf(context)!;
     final zoom = map.zoom;
     final bounds = map.bounds;
-
-    //futureStations = fetchStations(position, 20);
 
     return FutureBuilder<List<Polyline>>(
       future: futurePath,
@@ -57,23 +55,16 @@ Future<List<Polyline>> fetchPath(
     LatLng sposition, LatLng eposition, double rangeInKms) async {
   var client = http.Client();
 
-  final Map<String, String> httpHeaders = {
-    HttpHeaders.contentTypeHeader: "application/json",
-    "Connection": "Keep-Alive",
-    "Keep-Alive": "timeout=30, max=1000"
-  };
-
   var uri = Uri.parse(
       "http://10.0.2.2:5000/itineraire/position=${sposition.latitude},${sposition.longitude}&destination=${eposition.latitude},${eposition.longitude}&range=$rangeInKms");
 
-  var response = await client.get(uri, headers: httpHeaders);
+  var response = await client.get(uri);
 
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
     // then parse the JSON.
     List<Polyline> pathPolylines = List.empty(growable: true);
     var path = jsonDecode(response.body);
-
     //create a polyline for path
     pathJsonToPolyline(path!["geometry"]["coordinates"], pathPolylines);
 

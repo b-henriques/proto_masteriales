@@ -12,7 +12,7 @@ Future<List<Marker>> fetchStations(
   var client = http.Client();
 
   var uri = Uri.parse(
-      "http://10.0.2.2:5000//stationsInRange/position=${position.latitude},${position.longitude}&range=$distanceInKms");
+      "http://10.0.2.2:5000/stationsInRange/position=${position.latitude},${position.longitude}&range=$distanceInKms");
 
   var response = await client.get(uri);
   /*final response =
@@ -65,8 +65,6 @@ class _RechargeStationsMarkerLayerState
     final zoom = map.zoom;
     final bounds = map.bounds;
 
-    //futureStations = fetchStations(position, 20);
-
     return FutureBuilder<List<Marker>>(
       future: futureStations,
       builder: (context, snapshot) {
@@ -88,25 +86,65 @@ void stationJsonToMarker(
 ) {
   stationsMarkers.add(
     Marker(
-      width: 80,
-      height: 80,
-      point: LatLng((element['consolidated_latitude']).toDouble(),
-          (element['consolidated_longitude']).toDouble()),
-      builder: (contex) => GestureDetector(
-        onTap: () {
-          String nomStation = element['nom_station'] as String;
-          ScaffoldMessenger.of(contex).showSnackBar(
-            SnackBar(
-              content: Text(nomStation),
+        width: 80,
+        height: 80,
+        point: LatLng((element['consolidated_latitude']).toDouble(),
+            (element['consolidated_longitude']).toDouble()),
+        builder: (context) {
+          return GestureDetector(
+            onTap: () {
+              String nomStation = element['nom_station'] as String;
+              showModalBottomSheet<void>(
+                context: context,
+                builder: (context) {
+                  return StationInfoWidget(station: element);
+                },
+              );
+            },
+            child: const Icon(
+              Icons.electric_car,
+              size: 30,
+              color: Colors.red,
             ),
           );
-        },
-        child: const Icon(
-          Icons.electric_meter_rounded,
-          size: 30,
-          color: Colors.red,
-        ),
-      ),
-    ),
+        }),
   );
+}
+
+class StationInfoWidget extends StatelessWidget {
+  const StationInfoWidget({super.key, required this.station});
+
+  final dynamic station;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 300,
+      child: Column(
+        children: [
+          SizedBox(
+            height: 70,
+            child: Center(
+              child: Text(
+                station['nom_station'],
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 20),
+              ),
+            ),
+          ),
+          const Divider(thickness: 1),
+          const SizedBox(height: 3),
+          Text("Adresse: " + station['adresse_station']),
+          const SizedBox(height: 3),
+          Text("horaires: " + station['horaires']),
+          const SizedBox(height: 3),
+          Text("restriction_gabarit: " + station['restriction_gabarit']),
+          const SizedBox(height: 3),
+          Text("accessibilite_pmr: " + station['accessibilite_pmr']),
+          const SizedBox(height: 3),
+          Text("observations: " + station['observations']),
+        ],
+      ),
+    );
+  }
 }

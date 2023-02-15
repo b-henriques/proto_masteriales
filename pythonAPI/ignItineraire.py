@@ -1,7 +1,7 @@
 import requests
 from dist import distanceInKms
 from math import floor
-import copy
+import json
 
 """
 https://geoservices.ign.fr/documentation/services/api-et-services-ogc/geocodage-20/doc-technique-api-autocompletion
@@ -60,7 +60,7 @@ class GeoServices:
         stationKey = sortedStationsByDirectDistance[0].key
         station = self.stationsProvider.stationsRechargeData[stationKey]
         minPathDist, jsonPath = self.shortestPathDist(start, end, station)
-
+        """
         print(len(sortedStationsByDirectDistance))
         # remove stations wich directDistance is superior than minPathDist
         sortedStationsByDirectDistance = self.removeStationsWithSuperiorDistance(
@@ -74,6 +74,7 @@ class GeoServices:
 
         # find the station wich minimizes detour
         while(len(sortedStationsByDirectDistance) > 1):
+            print(len(sortedStationsByDirectDistance))
             # get the next station
             stationPrimeKey = sortedStationsByDirectDistance[1].key
             stationPrime = self.stationsProvider.stationsRechargeData[stationPrimeKey]
@@ -93,7 +94,11 @@ class GeoServices:
                     i=0,
                     j=len(sortedStationsByDirectDistance)-1
                 )
+            else:
+                del(sortedStationsByDirectDistance[1])
+        print(minPathDist)
         print(sortedStationsByDirectDistance)
+        """
         return jsonPath
 
     def sortStationsByDirectDistance(self, start, end, stations):
@@ -249,7 +254,7 @@ class RequeteItineraire:
 
     def addIntermidiate(self, intermidiate):
         self.requete = self.requete + \
-            f"&intermediate={intermidiate[0], intermidiate[1]}"
+            f"&intermediates={intermidiate[1]},{intermidiate[0]}"
         return self
     # TODO:
 
