@@ -2,7 +2,7 @@ from time import sleep
 from threading import Timer
 import random
 
-FULL_BATTERY_RANGE = 300  # in kms
+FULL_BATTERY_RANGE = 300  # in kms  N
 UPDATE_INTERVAL = 10  # in seconds
 
 
