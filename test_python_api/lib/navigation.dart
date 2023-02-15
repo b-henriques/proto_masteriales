@@ -58,7 +58,6 @@ Future<List<Polyline>> fetchPath(
   var uri = Uri.parse(
       "http://10.0.2.2:5000/itineraire/position=${sposition.latitude},${sposition.longitude}&destination=${eposition.latitude},${eposition.longitude}&range=$rangeInKms");
 
-  print("SEND");
   var response = await client.get(uri);
 
   if (response.statusCode == 200) {
@@ -66,7 +65,6 @@ Future<List<Polyline>> fetchPath(
     // then parse the JSON.
     List<Polyline> pathPolylines = List.empty(growable: true);
     var path = jsonDecode(response.body);
-    print(path);
     //create a polyline for path
     pathJsonToPolyline(path!["geometry"]["coordinates"], pathPolylines);
 

@@ -3,6 +3,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:test_python_api/navigationpage.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:test_python_api/place.dart';
+import 'package:flutter/cupertino.dart';
 
 class PickDestinationPage extends StatelessWidget {
   const PickDestinationPage({Key? key}) : super(key: key);
@@ -75,9 +76,103 @@ class PickDestinationFormState extends State<PickDestinationForm> {
                 );
               },
             ),
+            const SizedBox(height: 10),
+            const Divider(
+              height: 20,
+              thickness: 1,
+              indent: 20,
+              endIndent: 20,
+              color: Colors.grey,
+            ),
+            const SizedBox(height: 10),
+            const TypePicker(),
           ],
         ),
       ),
+    );
+  }
+}
+
+const List<String> typesPrise = <String>[
+  'type_ef',
+  'type_2',
+  'type_combo_ccs',
+  'type_chademo',
+  'type_autre',
+];
+
+class TypePicker extends StatefulWidget {
+  const TypePicker({super.key});
+
+  @override
+  State<TypePicker> createState() => _TypePickerState();
+}
+
+class _TypePickerState extends State<TypePicker> {
+  int selectedtypePrise = 0;
+
+  void _showDialog(Widget child) {
+    showCupertinoModalPopup<void>(
+        context: context,
+        builder: (BuildContext context) => Container(
+              height: 216,
+              padding: const EdgeInsets.only(top: 6.0),
+              margin: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              color: CupertinoColors.systemBackground.resolveFrom(context),
+              child: SafeArea(
+                top: false,
+                child: child,
+              ),
+            ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        const Text("Prise "),
+        Container(
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+            border: Border.all(
+              width: 1.0,
+              color: Colors.black,
+            ),
+          ),
+          child: CupertinoButton(
+            padding: EdgeInsets.all(5.0),
+            onPressed: () => _showDialog(
+              CupertinoPicker(
+                magnification: 1.22,
+                squeeze: 1.2,
+                useMagnifier: true,
+                itemExtent: 32,
+                onSelectedItemChanged: (int selectedItem) {
+                  setState(() {
+                    selectedtypePrise = selectedItem;
+                  });
+                },
+                children: List<Widget>.generate(typesPrise.length, (int index) {
+                  return Center(
+                    child: Text(
+                      typesPrise[index],
+                    ),
+                  );
+                }),
+              ),
+            ),
+            child: Text(
+              typesPrise[selectedtypePrise],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

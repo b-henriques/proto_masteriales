@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map/plugin_api.dart';
+import 'package:test_python_api/position.dart';
 import 'package:test_python_api/stations.dart';
 
 import 'navigation.dart';
@@ -33,8 +34,6 @@ class _NavigationPageState extends State<NavigationPage> {
 
   double lastBatteryCharge = 0;
 
-  Location location = Location();
-
   @override
   void initState() {
     super.initState();
@@ -46,10 +45,8 @@ class _NavigationPageState extends State<NavigationPage> {
       // set initial position
       position!.then((posvalue) {
         // fetch path
-        futurePath = fetchPath(
-            LatLng(posvalue!.latitude!, posvalue!.longitude!),
-            widget.destination,
-            value.range);
+        futurePath = fetchPath(LatLng(posvalue!.latitude!, posvalue.longitude!),
+            widget.destination, value.range);
         // set lastbatterycharge
         lastBatteryCharge = value.charge;
         // set last upload date
@@ -83,31 +80,6 @@ class _NavigationPageState extends State<NavigationPage> {
     });
   }
 
-  Future<LocationData?> getPosition() async {
-    bool serviceEnabled;
-    PermissionStatus permissionGranted;
-    LocationData locationData;
-
-    serviceEnabled = await location.serviceEnabled();
-    if (!serviceEnabled) {
-      serviceEnabled = await location.requestService();
-      if (!serviceEnabled) {
-        return null;
-      }
-    }
-
-    permissionGranted = await location.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await location.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) {
-        return null;
-      }
-    }
-
-    locationData = await location.getLocation();
-    return locationData;
-  }
-
   @override
   void dispose() {
     timer.cancel();
@@ -125,117 +97,143 @@ class _NavigationPageState extends State<NavigationPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Flexible(
-              child: FlutterMap(
-                options: MapOptions(
-                  center: LatLng(48.626067, 2.424743),
-                  zoom: 15,
-                  maxZoom: 18,
-                ),
-                nonRotatedChildren: [
-                  AttributionWidget.defaultWidget(
-                    source: 'OpenStreetMap contributors',
-                    onSourceTapped: null,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        width: 2.0,
-                        color: Colors.black,
+              child: FutureBuilder(
+                future: position,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return FlutterMap(
+                      options: MapOptions(
+                        center: LatLng(snapshot.data!.latitude!,
+                            snapshot.data!.longitude!),
+                        zoom: 15,
+                        maxZoom: 18,
                       ),
-                      color: Colors.white,
-                    ),
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.battery_4_bar_outlined),
-                            FutureBuilder<BatteryStatus>(
-                              future: batteryStatus,
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  return Text(
-                                      "${snapshot.data?.charge.toStringAsFixed(2)} %");
-                                } else if (snapshot.hasError) {
-                                  return Text('${snapshot.error}');
-                                }
-                                // By default, show a loading spinner.
-                                return const Text("Fetching Battery Status");
-                              },
-                            )
-                          ],
+                      nonRotatedChildren: [
+                        AttributionWidget.defaultWidget(
+                          source: 'OpenStreetMap contributors',
+                          onSourceTapped: null,
                         ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.flash_auto_rounded),
-                            FutureBuilder<BatteryStatus>(
+                        Positioned(
+                          top: 10,
+                          left: 10,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8)),
+                              border: Border.all(
+                                width: 2.0,
+                                color: Colors.black,
+                              ),
+                              color: Colors.white,
+                            ),
+                            padding: const EdgeInsets.all(8.0),
+                            child: FutureBuilder<BatteryStatus>(
                               future: batteryStatus,
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
-                                  return Text(
-                                      "${snapshot.data?.range.toStringAsFixed(2)} Kms");
+                                  return Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(
+                                              Icons.battery_4_bar_outlined),
+                                          Text(
+                                              "${snapshot.data?.charge.toStringAsFixed(2)} %"),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.time_to_leave),
+                                          Text(
+                                              "${snapshot.data?.range.toStringAsFixed(2)} Kms"),
+                                        ],
+                                      ),
+                                    ],
+                                  );
                                 } else if (snapshot.hasError) {
                                   return Text('${snapshot.error}');
                                 }
-                                // By default, show a loading spinner.
                                 return const Text("Fetching Battery Status");
                               },
-                            )
-                          ],
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(8)),
+                              border: Border.all(
+                                width: 2.0,
+                                color: Colors.black,
+                              ),
+                              color: Colors.white,
+                            ),
+                            padding: const EdgeInsets.all(8.0),
+                            //TODO: display intructions
+                            child: Column(children: const [
+                              Icon(Icons.u_turn_left),
+                              Text("Uturn"),
+                            ]),
+                          ),
                         ),
                       ],
-                    ),
-                  ),
-                ],
-                children: [
-                  TileLayer(
-                    urlTemplate:
-                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'com.example.app',
-                  ),
-                  FutureBuilder<List<Polyline>>(
-                    future: futurePath,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return PolylineLayer(
-                          polylines: snapshot.data!,
-                          polylineCulling: true,
-                        );
-                      } else if (snapshot.hasError) {
-                        return Text('${snapshot.error}');
-                      }
-                      // By default, show a loading spinner.
-                      return Text("");
-                    },
-                  ),
-                  RechargeStationsMarkerLayer(),
-                  FutureBuilder<LocationData?>(
-                    future: position,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return MarkerLayer(
+                      children: [
+                        TileLayer(
+                          urlTemplate:
+                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          userAgentPackageName: 'com.example.app',
+                        ),
+                        FutureBuilder<List<Polyline>>(
+                          future: futurePath,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return PolylineLayer(
+                                polylines: snapshot.data!,
+                                polylineCulling: true,
+                              );
+                            } else if (snapshot.hasError) {
+                              return Text('${snapshot.error}');
+                            }
+                            return Text("");
+                          },
+                        ),
+                        RechargeStationsMarkerLayer(),
+                        MarkerLayer(
                           markers: [
                             Marker(
                               point: LatLng(snapshot.data!.latitude!,
                                   snapshot.data!.longitude!),
                               builder: (context) {
-                                return const Icon(Icons.circle);
+                                return Transform.rotate(
+                                  angle: snapshot.data!.heading!,
+                                  child: Icon(
+                                    Icons.adjust,
+                                    size: 500 /
+                                        (FlutterMapState.maybeOf(context)!
+                                            .zoom),
+                                    color: Colors.blue,
+                                  ),
+                                );
                               },
                             ),
                           ],
-                        );
-                      } else if (snapshot.hasError) {
-                        return Text('${snapshot.error}');
-                      }
-                      return Text("");
-                    },
-                  )
-                ],
+                        ),
+                      ],
+                    );
+                  } else if (snapshot.hasError) {
+                    return Text('${snapshot.error}');
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
+                },
               ),
-            ),
+            )
           ],
         ),
       ),

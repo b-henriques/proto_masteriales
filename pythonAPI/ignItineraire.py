@@ -60,8 +60,6 @@ class GeoServices:
         stationKey = sortedStationsByDirectDistance[0].key
         station = self.stationsProvider.stationsRechargeData[stationKey]
         minPathDist, jsonPath = self.shortestPathDist(start, end, station)
-        print(stationKey)
-
         """
         print(len(sortedStationsByDirectDistance))
         # remove stations wich directDistance is superior than minPathDist
@@ -101,10 +99,6 @@ class GeoServices:
         print(minPathDist)
         print(sortedStationsByDirectDistance)
         """
-        
-        with (open('Ressources\path_test.json', 'w')) as file:
-        # load data
-            file.write(json.dumps(jsonPath))
         return jsonPath
 
     def sortStationsByDirectDistance(self, start, end, stations):
@@ -150,7 +144,6 @@ class GeoServices:
 
     def shortestPathDist(self, start, end, station):
         r = CarRequestBuilder().buildRequestXiY(start, end, station)
-        print(r.toString())
         json = self.calculItineraire(r)
         dist = json["distance"]
         return dist, json

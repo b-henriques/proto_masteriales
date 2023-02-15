@@ -38,11 +38,11 @@ def calculItineraire(slat, slon, elat, elon, range):
 
     #r = ignItineraire.CarRequestBuilder().buildSimpleRequest((slat, slon), (elat, elon))
     #res = current_app.geoServices.calculItineraire(r)
-    with (open('Ressources\path_test.json')) as file:
-        # load data
-        res = json.load(file)
+    # with (open('Ressources\path_test.json')) as file:
+    #     # load data
+    #     res = json.load(file)
 
-    #res = current_app.geoServices.calculItineraireXYRange((slat, slon), (elat, elon), range)
+    res = current_app.geoServices.calculItineraireXYRange((slat, slon), (elat, elon), range)
     return Response(dumps(res), mimetype='application/json', headers={})
 
 
@@ -79,6 +79,11 @@ if __name__ == '__main__':
     WSGIRequestHandler.protocol_version = "HTTP/1.1"
     app.run(threaded=True, host="0.0.0.0")
 
-    # Paris-Marseille
-    #res = ignItineraire.GeoServices(StationRechargeProvider()).calculItineraireXYRange((48.855595, 2.338286), (43.296292, 5.373333), 150)
+    #
+    # res = ignItineraire.GeoServices(StationRechargeProvider()).calculItineraireXYRange((48.62525, 2.4404133), (48.895347, 2.31048), 300)
+    # print(json.dumps(res))
+    # with (open('Ressources\path_test.json', 'w')) as file:
+    #     # load data
+    #         file.write(json.dumps(res))
+    # print("DONE")
     # print(res)
