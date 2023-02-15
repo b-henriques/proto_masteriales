@@ -26,14 +26,14 @@ TODO: (client) actualisation iteneraire en fonction du temps ecoule, niveua de b
 TODO: (client) indications navigation: nom rue actuelle, sortir a droite,rondpoint... <br>
 
 ---
-DONE: affichage carte openstreetmap - Bruno <br>
-DONE: serveur calcul distances, passage distance kms vers lat,lon, boundingbox - Bruno <br>
-DONE: serveur flask, requete stations de recharge in range - Bruno <br>
-DONE: affichage des stations de recharge - Bruno <br>
-DONE: serveur flask, communication avec ign geoservices - Bruno <br>
-DONE: serveur flask, requete itineraire simple - Bruno <br>
-DONE: serveur flask requete itineraire en passant par une station de  recharge(algo proposé) - Bruno <br>
-DONE: Affichage du trajet - Bruno <br>
+DONE: affichage carte openstreetmap <br>
+DONE: serveur calcul distances, passage distance kms vers lat,lon, boundingbox  <br>
+DONE: serveur flask, requete stations de recharge in range <br>
+DONE: affichage des stations de recharge <br>
+DONE: serveur flask, communication avec ign geoservices <br>
+DONE: serveur flask, requete itineraire simple  <br>
+DONE: serveur flask requete itineraire en passant par une station de  recharge(algo proposé)  <br>
+DONE: Affichage du trajet <br>
 
 ---
 ### Test
